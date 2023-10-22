@@ -31,15 +31,8 @@ struct ChatSheetView: View {
       ForEach(self.vm.messages) { message in
         MessageView(message: message)
       }
-      if self.vm.isFetchingMessages {
-        HStack {
-          Spacer()
-          ProgressView()
-            .progressViewStyle(.circular)
-          Spacer()
-        }
-      }
     }
+    .listStyle(.plain)
     
     Spacer()
     
@@ -52,6 +45,12 @@ struct ChatSheetView: View {
         .onSubmit {
           self.vm.onSubmitMessage(self.inputText)
         }
+      
+      if self.vm.isFetchingMessages {
+        ProgressView()
+          .progressViewStyle(.circular)
+          .padding(.trailing)
+      }
     }
   }
 }
