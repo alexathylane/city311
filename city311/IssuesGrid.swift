@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct IssuesGrid: View {
-  let symbols = Issues.allCases
-  let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
+  @ObservedObject var vm: ViewModel
+  
+  private let issues = Issues.allCases
+  private let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
   
   var body: some View {
     Text("Select your issue below...")
@@ -18,13 +20,11 @@ struct IssuesGrid: View {
       .font(.title2)
     
     LazyVGrid(columns: self.columns, spacing: 0) {
-      ForEach(self.symbols) { symbol in
+      ForEach(self.issues) { issue in
         VStack {
-          Image(systemName: symbol.symbolName)
-            .font(.largeTitle)
-            .padding(.bottom, 4)
-          Text(symbol.shortText)
-            .font(.footnote)
+          IssueButton(issue: issue) {
+            self.vm.createIssue(issue)
+          }
         }
         .padding()
       }
@@ -32,10 +32,29 @@ struct IssuesGrid: View {
   }
 }
 
-enum Issues: CaseIterable, Identifiable {
+struct IssueButton: View {
+  let issue: Issues
+  let action: () -> Void
+  
+  var body: some View {
+    Button(action: {
+      self.action()
+    }, label: {
+      VStack(spacing: 6) {
+        Image(systemName: issue.symbolName)
+          .font(.title)
+        Text(issue.shortText)
+          .font(.caption)
+      }
+    })
+  }
+}
+
+enum Issues: String, CaseIterable, Identifiable {
+  
   var id: Issues { self }
   
-  case accessibility, collision, sanitation, noise, road, vehicular, animal, miscellaneous
+  case accessibility, collision, sanitation, noise, road, vehicular, animal, other
   
   var symbolName: String {
     switch self {
@@ -46,7 +65,7 @@ enum Issues: CaseIterable, Identifiable {
       case .road: return "road.lanes"
       case .vehicular: return "car"
       case .animal: return "cat"
-      case .miscellaneous: return "ellipsis.circle"
+      case .other: return "ellipsis.circle"
     }
   }
   
@@ -59,7 +78,7 @@ enum Issues: CaseIterable, Identifiable {
       case .road: return "Road"
       case .vehicular: return "Vehicular"
       case .animal: return "Animal"
-      case .miscellaneous: return "Something else"
+      case .other: return "Something else"
     }
   }
 }
