@@ -27,12 +27,21 @@ struct ChatSheetView: View {
   @State private var inputText = ""
   
   var body: some View {
-    List {
-      ForEach(self.vm.messages) { message in
-        MessageView(message: message)
+    ScrollViewReader { proxy in
+      List {
+        ForEach(self.vm.messages) { message in
+          MessageView(message: message)
+            .id(message.id)
+        }
+      }
+      .listStyle(.plain)
+      .onChange(of: self.vm.messages) { oldValue, newValue in
+        guard let lastMessage = newValue.last else { return }
+        withAnimation {
+          proxy.scrollTo(lastMessage.id)
+        }
       }
     }
-    .listStyle(.plain)
     
     Spacer()
     

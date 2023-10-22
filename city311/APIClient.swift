@@ -117,7 +117,7 @@ struct MessageResponse: Decodable {
   let messages: [Message]
 }
 
-struct Message: Decodable, Identifiable {
+struct Message: Decodable, Identifiable, Equatable {
   let userId: String
   let text: String
   
