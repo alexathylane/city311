@@ -9,12 +9,12 @@ class APIClient {
     self.userId = userId
   }
   
-  func createMessage(issueId: Int, text: String) async throws {
+  func createMessage(issueId: String, text: String) async throws {
     var urlComponents = URLComponents(url: self.baseURL, resolvingAgainstBaseURL: true)
     urlComponents?.path = "/new_message"
     urlComponents?.queryItems = [
       URLQueryItem(name: "user_id", value: self.userId),
-      URLQueryItem(name: "issue_id", value: String(issueId)),
+      URLQueryItem(name: "issue_id", value: issueId),
       URLQueryItem(name: "text", value: text)
     ]
     
@@ -40,7 +40,7 @@ class APIClient {
     print(responseObject)
   }
   
-  func createIssue(_ issue: Issues, completion: @escaping (Result<Int, Error>) -> Void) {
+  func createIssue(_ issue: Issues, completion: @escaping (Result<String, Error>) -> Void) {
     Task {
       do {
         let issueId = try await self._createIssue(issue)
@@ -51,7 +51,7 @@ class APIClient {
     }
   }
   
-  private func _createIssue(_ issue: Issues) async throws -> Int {
+  private func _createIssue(_ issue: Issues) async throws -> String {
     // Construct the URL
     var urlComponents = URLComponents(url: self.baseURL, resolvingAgainstBaseURL: true)
     urlComponents?.path = "/new_issue"
@@ -79,10 +79,15 @@ class APIClient {
     // Decode the JSON response
     let responseObject = try self.decoder.decode(CreateIssueResponse.self, from: data)
     
-    return responseObject.issueId
+    return String(responseObject.issueId)
   }
   
-  private let decoder = JSONDecoder()
+  private lazy var decoder: JSONDecoder = {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return decoder
+  }()
+  
   private let userId: String
   private let baseURL = URL(string: "http://ec2-34-227-206-199.compute-1.amazonaws.com:8000")!
 }
@@ -91,14 +96,8 @@ class APIClient {
 
 struct CreateIssueResponse: Decodable {
   let userId: String
-  let issueId: Int
+  let issueId: String
   let issueType: String
-  
-  enum CodingKeys: String, CodingKey {
-    case userId = "user_id"
-    case issueId = "issue_id"
-    case issueType = "issue_type"
-  }
 }
 
 // MARK: - MessageResponse
@@ -111,9 +110,4 @@ struct MessageResponse: Decodable {
 struct Message: Decodable {
   let userId: String
   let text: String
-  
-  enum CodingKeys: String, CodingKey {
-    case userId = "user_id"
-    case text
-  }
 }
