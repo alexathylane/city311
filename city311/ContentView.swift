@@ -42,6 +42,12 @@ struct ChatSheetView: View {
         .lineLimit(4)
         .multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
         .padding()
+        .onChange(of: self.inputText) { input in
+          if input.last == "\n" {
+            self.vm.onSubmitMessage(self.inputText)
+            self.inputText = ""
+          }
+        }
         .onSubmit {
           self.vm.onSubmitMessage(self.inputText)
         }
@@ -61,7 +67,8 @@ struct MessageView: View {
   var body: some View {
     HStack {
       VStack(alignment: .leading) {
-        Text(message.userId)
+        let name = message.userId.contains("City") ? "🤖 \(message.userId)" : message.userId
+        Text(name)
           .font(.footnote)
           .bold()
         
