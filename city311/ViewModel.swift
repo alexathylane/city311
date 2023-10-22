@@ -14,6 +14,7 @@ final class ViewModel: ObservableObject {
   @Published var isFetchingMessages = false
   
   @MainActor func createIssue(_ issue: IssueType) {
+    self.messages = [] // clear out previous chat
     APIClient.shared.createIssue(issue) { result in
       switch result {
         case .success(let issueId):
