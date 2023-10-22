@@ -42,9 +42,9 @@ struct IssueButton: View {
     }, label: {
       VStack(spacing: 6) {
         Image(systemName: issue.symbolName)
-          .font(.title)
+          .font(.largeTitle)
         Text(issue.shortText)
-          .font(.caption)
+          .font(.body)
       }
     })
   }
