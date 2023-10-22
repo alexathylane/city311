@@ -8,13 +8,15 @@
 import Foundation
 
 final class ViewModel: ObservableObject {
-  @Published var issueId: Int?
+  @Published var issueId: String?
+  @Published var showChatSheet = false
   
   @MainActor func createIssue(_ issue: Issues) {
     APIClient.shared.createIssue(issue) { result in
       switch result {
         case .success(let issueId):
           self.issueId = issueId
+          self.showChatSheet = true
         case .failure(let error):
           print(error)
       }
