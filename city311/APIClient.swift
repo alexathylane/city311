@@ -50,7 +50,7 @@ class APIClient {
     return responseObject
   }
   
-  func createIssue(_ issue: Issues, completion: @escaping (Result<String, Error>) -> Void) {
+  func createIssue(_ issue: IssueType, completion: @escaping (Result<String, Error>) -> Void) {
     Task {
       do {
         let issueId = try await self._createIssue(issue)
@@ -61,7 +61,7 @@ class APIClient {
     }
   }
   
-  private func _createIssue(_ issue: Issues) async throws -> String {
+  private func _createIssue(_ issue: IssueType) async throws -> String {
     // Construct the URL
     var urlComponents = URLComponents(url: self.baseURL, resolvingAgainstBaseURL: true)
     urlComponents?.path = "/new_issue"

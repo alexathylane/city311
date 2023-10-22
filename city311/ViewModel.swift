@@ -12,7 +12,7 @@ final class ViewModel: ObservableObject {
   @Published var showChatSheet = false
   @Published var messages: [Message] = []
   
-  @MainActor func createIssue(_ issue: Issues) {
+  @MainActor func createIssue(_ issue: IssueType) {
     APIClient.shared.createIssue(issue) { result in
       switch result {
         case .success(let issueId):

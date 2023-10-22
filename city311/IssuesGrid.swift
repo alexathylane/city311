@@ -10,7 +10,7 @@ import SwiftUI
 struct IssuesGrid: View {
   @ObservedObject var vm: ViewModel
   
-  private let issues = Issues.allCases
+  private let issues = IssueType.allCases
   private let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
   
   var body: some View {
@@ -33,7 +33,7 @@ struct IssuesGrid: View {
 }
 
 struct IssueButton: View {
-  let issue: Issues
+  let issue: IssueType
   let action: () -> Void
   
   var body: some View {
@@ -50,9 +50,9 @@ struct IssueButton: View {
   }
 }
 
-enum Issues: String, CaseIterable, Identifiable {
+enum IssueType: String, CaseIterable, Identifiable {
   
-  var id: Issues { self }
+  var id: IssueType { self }
   
   case accessibility, collision, sanitation, noise, road, vehicular, animal, other
   
