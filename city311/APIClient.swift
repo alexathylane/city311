@@ -9,7 +9,18 @@ class APIClient {
     self.userId = userId
   }
   
-  func createMessage(issueId: String, text: String) async throws {
+  func createMessage(issueId: String, text: String, completion: @escaping (Result<[Message], Error>) -> Void) {
+    Task {
+      do {
+        let messageResponse = try await self._createMessage(issueId: issueId, text: text)
+        await MainActor.run { completion(.success(messageResponse.messages)) }
+      } catch {
+        await MainActor.run { completion(.failure(error)) }
+      }
+    }
+  }
+  
+  private func _createMessage(issueId: String, text: String) async throws -> MessageResponse {
     var urlComponents = URLComponents(url: self.baseURL, resolvingAgainstBaseURL: true)
     urlComponents?.path = "/new_message"
     urlComponents?.queryItems = [
@@ -36,8 +47,7 @@ class APIClient {
     
     // Decode the JSON response
     let responseObject = try self.decoder.decode(MessageResponse.self, from: data)
-    
-    print(responseObject)
+    return responseObject
   }
   
   func createIssue(_ issue: Issues, completion: @escaping (Result<String, Error>) -> Void) {
@@ -107,7 +117,11 @@ struct MessageResponse: Decodable {
   let messages: [Message]
 }
 
-struct Message: Decodable {
+struct Message: Decodable, Identifiable {
   let userId: String
   let text: String
+  
+  var id: String {
+    userId + text
+  }
 }

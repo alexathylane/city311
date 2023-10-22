@@ -10,6 +10,7 @@ import Foundation
 final class ViewModel: ObservableObject {
   @Published var issueId: String?
   @Published var showChatSheet = false
+  @Published var messages: [Message] = []
   
   @MainActor func createIssue(_ issue: Issues) {
     APIClient.shared.createIssue(issue) { result in
@@ -23,12 +24,17 @@ final class ViewModel: ObservableObject {
     }
   }
   
-  func onSubmitMessage(_ text: String) {
+  @MainActor func onSubmitMessage(_ text: String) {
     guard let issueId = self.issueId else { fatalError() }
     guard text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else { return }
     
-    Task {
-      try await APIClient.shared.createMessage(issueId: issueId, text: text)
+    APIClient.shared.createMessage(issueId: issueId, text: text) { result in
+      switch result {
+        case.success(let messages):
+          self.messages = messages
+        case .failure(let error):
+          print(error)
+      }
     }
   }
   

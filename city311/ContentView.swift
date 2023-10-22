@@ -15,7 +15,7 @@ struct ContentView: View {
       .padding(.top)
       .padding(.top)
       .sheet(isPresented: self.$vm.showChatSheet) {
-        Text("Hello world")
+        ChatSheetView(vm: self.vm)
       }
     
     Spacer()
@@ -27,14 +27,41 @@ struct ChatSheetView: View {
   @State private var inputText = ""
   
   var body: some View {
+    List {
+      ForEach(self.vm.messages) { message in
+        MessageView(message: message)
+      }
+    }
+    
+    Spacer()
     TextField("Enter details about the issue", text: self.$inputText, axis: .vertical)
       .textFieldStyle(.roundedBorder)
-      .lineLimit(5)
+      .lineLimit(4)
       .multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
       .padding()
       .onSubmit {
         self.vm.onSubmitMessage(self.inputText)
       }
+  }
+}
+
+struct MessageView: View {
+  let message: Message
+  
+  var body: some View {
+    HStack {
+      VStack(alignment: .leading) {
+        Text(message.userId)
+          .font(.footnote)
+          .bold()
+        
+        Text(message.text)
+          .font(.body)
+      }
+      
+      Spacer()
+    }
+    .padding()
   }
 }
 
