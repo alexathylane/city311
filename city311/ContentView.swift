@@ -25,6 +25,7 @@ struct ContentView: View {
 struct ChatSheetView: View {
   @ObservedObject var vm: ViewModel
   @State private var inputText = ""
+  @FocusState private var isFocused: Bool
   
   var body: some View {
     ScrollViewReader { proxy in
@@ -47,6 +48,12 @@ struct ChatSheetView: View {
     
     HStack {
       TextField("Enter details about the issue", text: self.$inputText, axis: .vertical)
+        .focused($isFocused)
+        .onAppear {
+          DispatchQueue.main.async {
+            self.isFocused = true
+          }
+        }
         .textFieldStyle(.roundedBorder)
         .lineLimit(4)
         .multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
