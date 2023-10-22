@@ -1,11 +1,3 @@
-//
-//  APIClient.swift
-//  city311
-//
-//  Created by Alexandria Rohn on 10/22/23.
-//
-
-import Foundation
 
 import Foundation
 
@@ -18,10 +10,8 @@ class APIClient {
   }
   
   func createMessage(issueId: Int, text: String) async throws {
-    // Create URLComponents from the base URL string
     var urlComponents = URLComponents(url: self.baseURL, resolvingAgainstBaseURL: true)
-    
-    // Add the query parameters
+    urlComponents?.path = "/new_message"
     urlComponents?.queryItems = [
       URLQueryItem(name: "user_id", value: self.userId),
       URLQueryItem(name: "issue_id", value: String(issueId)),
@@ -45,7 +35,7 @@ class APIClient {
     }
     
     // Decode the JSON response
-    let responseObject = try self.decoder.decode(CreateIssueResponse.self, from: data)
+    let responseObject = try self.decoder.decode(MessageResponse.self, from: data)
     
     print(responseObject)
   }
@@ -97,6 +87,8 @@ class APIClient {
   private let baseURL = URL(string: "http://ec2-34-227-206-199.compute-1.amazonaws.com:8000")!
 }
 
+// MARK: - CreateIssueResponse
+
 struct CreateIssueResponse: Decodable {
   let userId: String
   let issueId: Int
@@ -108,6 +100,14 @@ struct CreateIssueResponse: Decodable {
     case issueType = "issue_type"
   }
 }
+
+// MARK: - MessageResponse
+
+struct MessageResponse: Decodable {
+  let status: String
+  let messages: [Message]
+}
+
 struct Message: Decodable {
   let userId: String
   let text: String
@@ -116,9 +116,4 @@ struct Message: Decodable {
     case userId = "user_id"
     case text
   }
-}
-
-struct MessageResponse: Decodable {
-  let status: String
-  let messages: [Message]
 }
