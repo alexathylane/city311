@@ -31,17 +31,28 @@ struct ChatSheetView: View {
       ForEach(self.vm.messages) { message in
         MessageView(message: message)
       }
+      if self.vm.isFetchingMessages {
+        HStack {
+          Spacer()
+          ProgressView()
+            .progressViewStyle(.circular)
+          Spacer()
+        }
+      }
     }
     
     Spacer()
-    TextField("Enter details about the issue", text: self.$inputText, axis: .vertical)
-      .textFieldStyle(.roundedBorder)
-      .lineLimit(4)
-      .multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
-      .padding()
-      .onSubmit {
-        self.vm.onSubmitMessage(self.inputText)
-      }
+    
+    HStack {
+      TextField("Enter details about the issue", text: self.$inputText, axis: .vertical)
+        .textFieldStyle(.roundedBorder)
+        .lineLimit(4)
+        .multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
+        .padding()
+        .onSubmit {
+          self.vm.onSubmitMessage(self.inputText)
+        }
+    }
   }
 }
 

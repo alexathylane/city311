@@ -11,6 +11,7 @@ final class ViewModel: ObservableObject {
   @Published var issueId: String?
   @Published var showChatSheet = false
   @Published var messages: [Message] = []
+  @Published var isFetchingMessages = false
   
   @MainActor func createIssue(_ issue: IssueType) {
     APIClient.shared.createIssue(issue) { result in
@@ -28,7 +29,10 @@ final class ViewModel: ObservableObject {
     guard let issueId = self.issueId else { fatalError() }
     guard text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else { return }
     
+    self.isFetchingMessages = true
+    
     APIClient.shared.createMessage(issueId: issueId, text: text) { result in
+      self.isFetchingMessages = false
       switch result {
         case.success(let messages):
           self.messages = messages
